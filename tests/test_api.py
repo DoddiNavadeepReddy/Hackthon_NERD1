@@ -40,6 +40,13 @@ def test_health_endpoint(client):
     }
 
 
+def test_cors_allows_local_frontend(client):
+    response = client.get("/health", headers={"Origin": "http://localhost:3000"})
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:3000"
+
+
 def test_model_info_endpoint(client):
     response = client.get("/model-info")
 
@@ -340,4 +347,3 @@ def test_cors_preflight_predict(client):
     assert response.status_code == 200
     assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"
     assert "POST" in response.headers.get("access-control-allow-methods", "")
-

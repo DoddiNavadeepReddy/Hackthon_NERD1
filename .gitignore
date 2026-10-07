@@ -2,12 +2,40 @@ nsl-kdd/*.txt
 nsl-kdd/*.arff
 nsl-kdd/*.html
 nsl-kdd/*.jpg
+
+# Local environment files and secrets
 .env
 .env.local
+*.env.local
+
+# Python environments, caches, and test output
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 node_modules/
-dist/
-build/
-frontend/node_modules/
-frontend/dist/
 __pycache__/
 *.pyc
+*.pyo
+*.coverage
+coverage.xml
+htmlcov/
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/
+dist/
+build/
+
+# Editor and operating-system files
+.vscode/*
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
