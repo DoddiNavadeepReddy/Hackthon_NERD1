@@ -2,4 +2,4 @@ nsl-kdd/*.txt
 nsl-kdd/*.arff
 nsl-kdd/*.html
 nsl-kdd/*.jpg
-models/
+.env
