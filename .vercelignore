@@ -1,0 +1,11 @@
+backend/
+tests/
+models/
+scripts/
+*.py
+*.joblib
+*.ipynb
+Dockerfile
+render.yaml
+.venv/
+.pytest_cache/
