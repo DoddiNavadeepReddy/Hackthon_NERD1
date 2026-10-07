@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar.jsx';
 import ServerWakeBanner from './components/ServerWakeBanner.jsx';
-import Dashboard from './components/Dashboard.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import LiveDetection from './pages/LiveDetection.jsx';
+import Explainability from './pages/Explainability.jsx';
+import About from './pages/About.jsx';
+import BatchAnalysis from './pages/BatchAnalysis.jsx';
 import { getHealth, waitForServer } from './api/client.js';
 
 export default function App() {
@@ -84,19 +88,16 @@ export default function App() {
       />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 pb-16">
-        {activeTab === 'dashboard' ? (
-          <Dashboard onRetry={checkServer} />
-        ) : (
-          <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-8 shadow-[0_10px_30px_rgba(42,43,46,0.05)]">
-            <h1 className="font-display font-bold text-2xl text-[#2A2B2E] dark:text-white mb-2">{activeTab.replace('-', ' ')}</h1>
-            <p className="text-[#6B6D70] dark:text-gray-300 text-sm">This view is ready for the next backend-connected workflow.</p>
-          </div>
-        )}
+        {activeTab === 'dashboard' && <Dashboard onRetry={checkServer} onNavigate={setActiveTab} />}
+        {activeTab === 'live' && <LiveDetection />}
+        {activeTab === 'explainability' && <Explainability />}
+        {activeTab === 'about' && <About />}
+        {activeTab === 'batch' && <BatchAnalysis />}
       </main>
 
       <footer className="py-6 border-t border-[#EDEEEA] dark:border-[#2E3036] text-center text-xs text-[#6B6D70] dark:text-gray-400">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>NetGuard Intrusion Detection &bull; NSL-KDD Benchmark (2009, derived from 1999 DARPA traffic)</span>
+          <span>NERD Intrusion Detection &bull; NSL-KDD Benchmark (2009, derived from 1999 DARPA traffic)</span>
           <span>Baseline model: XGBoost on KDDTrain+_20Percent</span>
         </div>
       </footer>

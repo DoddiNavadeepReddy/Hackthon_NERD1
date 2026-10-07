@@ -1,4 +1,4 @@
-# NetGuard Frontend
+# NERD Frontend
 
 Modern, high-performance web dashboard for the NSL-KDD network intrusion detection system. Built with React, Vite, and Tailwind CSS adhering strictly to the design specifications in [`DESIGN.md`](./DESIGN.md).
 

@@ -1,12 +1,12 @@
 /**
- * NetGuard API Client
+ * NERD API Client
  * Generated strictly against docs/api-contract.md
  */
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /**
- * Standard display order for attack classes across all NetGuard UI views.
+ * Standard display order for attack classes across all NERD UI views.
  * Rule: Define the display order once in the client.
  */
 export const CLASS_DISPLAY_ORDER = ['normal', 'DoS', 'Probe', 'R2L', 'U2R'];
@@ -198,7 +198,14 @@ export async function getMetrics() {
  * Supports either flat 41 features object or { features: { ... } }
  */
 export async function predict(featureData, detail = 'full') {
-  const payload = featureData.features ? featureData : { features: featureData };
+  const raw = featureData && featureData.features ? featureData.features : (featureData || {});
+  const cleaned = {};
+  for (const [k, v] of Object.entries(raw)) {
+    if (k !== 'label' && k !== 'category' && k !== 'difficulty' && k !== 'id') {
+      cleaned[k] = v;
+    }
+  }
+  const payload = { features: cleaned };
   const query = detail ? `?detail=${encodeURIComponent(detail)}` : '';
   return apiFetch(`/predict${query}`, {
     method: 'POST',

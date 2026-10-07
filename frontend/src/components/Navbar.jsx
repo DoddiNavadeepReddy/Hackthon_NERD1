@@ -31,7 +31,7 @@ export default function Navbar({
           </div>
           <div className="flex flex-col">
             <span className="font-display font-extrabold text-lg tracking-tight text-[#2A2B2E] dark:text-white leading-none">
-              NetGuard
+              NERD
             </span>
             <span className="text-[10px] text-[#6B6D70] dark:text-gray-400 font-mono tracking-wider">
               NSL-KDD ML

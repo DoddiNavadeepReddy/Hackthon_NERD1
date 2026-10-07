@@ -1,4 +1,4 @@
-# NetGuard Backend API
+# NERD Backend API
 
 FastAPI service serving the trained NSL-KDD machine learning models, preprocessing pipelines, SHAP explainability artifacts, and intrusion classification endpoints.
 
@@ -73,9 +73,9 @@ uv run python -m pytest tests/ -v
 
 ### Docker
 ```bash
-docker build -t netguard-backend .
-docker run -p 8000:8000 -e FRONTEND_ORIGIN="https://your-frontend.vercel.app" netguard-backend
+docker build -t nerd-backend .
+docker run -p 8000:8000 -e FRONTEND_ORIGIN="https://your-frontend.vercel.app" nerd-backend
 ```
 
 ### Render Deployment
-The service includes [`render.yaml`](../render.yaml) configured for Render Web Service deployment. Note: Render free tier services sleep after idle; the NetGuard frontend includes an automated retry handler for cold starts.
+The service includes [`render.yaml`](../render.yaml) configured for Render Web Service deployment. Note: Render free tier services sleep after idle; the NERD frontend includes an automated retry handler for cold starts.
