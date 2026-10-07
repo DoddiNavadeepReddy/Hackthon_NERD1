@@ -327,3 +327,17 @@ def test_predict_batch_endpoint_rejects_invalid_csv(
 
     assert response.status_code == expected_status
     assert expected_detail in str(response.json()["detail"])
+
+
+def test_cors_preflight_predict(client):
+    headers = {
+        "Origin": "http://localhost:3000",
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type",
+    }
+    response = client.options("/predict", headers=headers)
+
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"
+    assert "POST" in response.headers.get("access-control-allow-methods", "")
+
