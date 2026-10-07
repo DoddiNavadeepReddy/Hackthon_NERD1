@@ -1,0 +1,1021 @@
+{
+  "provenance": {
+    "notebook": "network-intrusion-detection-with-ml-nsl-kdd.ipynb",
+    "artifact_files": [
+      "nsl_kdd_best_multiclass_model.joblib",
+      "nsl_kdd_preprocessor.joblib",
+      "nsl_kdd_target_encoder.joblib",
+      "nsl_kdd_metadata.joblib",
+      "nsl_kdd_feature_encoders.joblib",
+      "nsl_kdd_scaler.joblib"
+    ],
+    "raw_files": [
+      "KDDTrain+_20Percent.txt",
+      "KDDTrain+.txt",
+      "KDDTest+.txt",
+      "KDDTest-21.txt"
+    ],
+    "notebook_table_cells": {
+      "model_comparison": 38,
+      "full_vs_reduced": 48,
+      "imbalance": 36,
+      "cv": 50
+    }
+  },
+  "final_model": {
+    "name": "XGBoost",
+    "classes": [
+      "DoS",
+      "Probe",
+      "R2L",
+      "U2R",
+      "normal"
+    ],
+    "threshold_factors": {
+      "R2L": 5.0,
+      "U2R": 1.0
+    },
+    "metrics": {
+      "KDDTest+": {
+        "accuracy": 0.7724893541518808,
+        "macro_f1": 0.5390923162953954,
+        "weighted_f1": 0.7384896084308196,
+        "per_class": {
+          "normal": {
+            "precision": 0.674182234628874,
+            "recall": 0.9699310060755844,
+            "f1": 0.795456464825606,
+            "support": 9711.0
+          },
+          "DoS": {
+            "precision": 0.9613594040968343,
+            "recall": 0.8304289544235925,
+            "f1": 0.8911104718066744,
+            "support": 7460.0
+          },
+          "Probe": {
+            "precision": 0.8240534521158129,
+            "recall": 0.6113176373399422,
+            "f1": 0.7019207967749586,
+            "support": 2421.0
+          },
+          "R2L": {
+            "precision": 0.9694189602446484,
+            "recall": 0.10987868284228769,
+            "f1": 0.19738480697384808,
+            "support": 2885.0
+          },
+          "U2R": {
+            "precision": 0.6666666666666666,
+            "recall": 0.05970149253731343,
+            "f1": 0.1095890410958904,
+            "support": 67.0
+          }
+        }
+      },
+      "KDDTest-21": {
+        "accuracy": 0.5672573839662447,
+        "macro_f1": 0.44869278590006767,
+        "weighted_f1": 0.5635781015577249,
+        "per_class": {
+          "normal": {
+            "precision": 0.2901917979104943,
+            "recall": 0.8647769516728625,
+            "f1": 0.434559252772913,
+            "support": 2152.0
+          },
+          "DoS": {
+            "precision": 0.9251802884615384,
+            "recall": 0.708793738489871,
+            "f1": 0.8026590198123045,
+            "support": 4344.0
+          },
+          "Probe": {
+            "precision": 0.8221722003376477,
+            "recall": 0.6082431307243963,
+            "f1": 0.6992103374012921,
+            "support": 2402.0
+          },
+          "R2L": {
+            "precision": 0.9723926380368099,
+            "recall": 0.10987868284228769,
+            "f1": 0.19744627841793833,
+            "support": 2885.0
+          },
+          "U2R": {
+            "precision": 0.6666666666666666,
+            "recall": 0.05970149253731343,
+            "f1": 0.1095890410958904,
+            "support": 67.0
+          }
+        }
+      }
+    }
+  },
+  "cv": {
+    "metadata": [
+      {
+        "model": "XGBoost",
+        "cv_macro_f1_mean": 0.8847361322573605,
+        "cv_macro_f1_std": 0.04932695832799577,
+        "fold_scores": [
+          0.9249202039486629,
+          0.9032388031298918,
+          0.790429408943397,
+          0.8841004447401126,
+          0.9209918005247383
+        ]
+      },
+      {
+        "model": "Random Forest",
+        "cv_macro_f1_mean": 0.8512958649614711,
+        "cv_macro_f1_std": 0.05639697715691382,
+        "fold_scores": [
+          0.9110883725714635,
+          0.8502509249961383,
+          0.7922919498724712,
+          0.9179272883919418,
+          0.7849207889753409
+        ]
+      },
+      {
+        "model": "Logistic Regression",
+        "cv_macro_f1_mean": 0.7791382732723171,
+        "cv_macro_f1_std": 0.06805070895067279,
+        "fold_scores": [
+          0.817753725492795,
+          0.8576678544821524,
+          0.7012472822706697,
+          0.8253101892285318,
+          0.6937123148874369
+        ]
+      },
+      {
+        "model": "HistGradientBoosting",
+        "cv_macro_f1_mean": 0.7644718701055758,
+        "cv_macro_f1_std": 0.02357260074735547,
+        "fold_scores": [
+          0.734926290128586,
+          0.7392671547161254,
+          0.7708777168819286,
+          0.7941436774879683,
+          0.7831445113132707
+        ]
+      }
+    ],
+    "executed_notebook": [
+      {
+        "model": "XGBoost",
+        "cv_macro_f1_mean": "0.8847",
+        "cv_macro_f1_std": "0.0493"
+      },
+      {
+        "model": "Random Forest",
+        "cv_macro_f1_mean": "0.8513",
+        "cv_macro_f1_std": "0.0564"
+      },
+      {
+        "model": "Logistic Regression",
+        "cv_macro_f1_mean": "0.7791",
+        "cv_macro_f1_std": "0.0681"
+      },
+      {
+        "model": "HistGradientBoosting",
+        "cv_macro_f1_mean": "0.7645",
+        "cv_macro_f1_std": "0.0236"
+      },
+      {
+        "model": "Final model selected",
+        "cv_macro_f1_mean": "by 5-fold CV macro",
+        "cv_macro_f1_std": "F1: XGBoost"
+      }
+    ],
+    "selection": "mean macro F1 from stratified 5-fold CV on reduced training data"
+  },
+  "model_comparison": [
+    {
+      "model": "Random Forest",
+      "test_set": "KDDTest+",
+      "accuracy": 0.763,
+      "macro_f1": 0.5006,
+      "weighted_f1": 0.7198,
+      "R2L_recall": 0.0412,
+      "U2R_recall": 0.0149
+    },
+    {
+      "model": "Random Forest",
+      "test_set": "KDDTest-21",
+      "accuracy": 0.5497,
+      "macro_f1": 0.4096,
+      "weighted_f1": 0.5335,
+      "R2L_recall": 0.0412,
+      "U2R_recall": 0.0149
+    },
+    {
+      "model": "XGBoost",
+      "test_set": "KDDTest+",
+      "accuracy": 0.7666,
+      "macro_f1": 0.528,
+      "weighted_f1": 0.7267,
+      "R2L_recall": 0.0641,
+      "U2R_recall": 0.0746
+    },
+    {
+      "model": "XGBoost",
+      "test_set": "KDDTest-21",
+      "accuracy": 0.556,
+      "macro_f1": 0.4371,
+      "weighted_f1": 0.5437,
+      "R2L_recall": 0.0641,
+      "U2R_recall": 0.0746
+    },
+    {
+      "model": "Logistic Regression",
+      "test_set": "KDDTest+",
+      "accuracy": 0.7491,
+      "macro_f1": 0.5354,
+      "weighted_f1": 0.7018,
+      "R2L_recall": 0.0045,
+      "U2R_recall": 0.1642
+    },
+    {
+      "model": "Logistic Regression",
+      "test_set": "KDDTest-21",
+      "accuracy": 0.5234,
+      "macro_f1": 0.4313,
+      "weighted_f1": 0.4991,
+      "R2L_recall": 0.0045,
+      "U2R_recall": 0.1642
+    },
+    {
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest+",
+      "accuracy": 0.7382,
+      "macro_f1": 0.5178,
+      "weighted_f1": 0.6954,
+      "R2L_recall": 0.0315,
+      "U2R_recall": 0.209
+    },
+    {
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest-21",
+      "accuracy": 0.5028,
+      "macro_f1": 0.42,
+      "weighted_f1": 0.4885,
+      "R2L_recall": 0.0315,
+      "U2R_recall": 0.209
+    }
+  ],
+  "full_vs_reduced": [
+    {
+      "training": "reduced",
+      "model": "Random Forest",
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.0412,
+      "f1": 0.0792
+    },
+    {
+      "training": "reduced",
+      "model": "Random Forest",
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.0149,
+      "f1": 0.0294
+    },
+    {
+      "training": "reduced",
+      "model": "Random Forest",
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.0412,
+      "f1": 0.0792
+    },
+    {
+      "training": "reduced",
+      "model": "Random Forest",
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.0149,
+      "f1": 0.0294
+    },
+    {
+      "training": "reduced",
+      "model": "XGBoost",
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.0641,
+      "f1": 0.1204
+    },
+    {
+      "training": "reduced",
+      "model": "XGBoost",
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.0746,
+      "f1": 0.1351
+    },
+    {
+      "training": "reduced",
+      "model": "XGBoost",
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.0641,
+      "f1": 0.1204
+    },
+    {
+      "training": "reduced",
+      "model": "XGBoost",
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.0746,
+      "f1": 0.1351
+    },
+    {
+      "training": "reduced",
+      "model": "Logistic Regression",
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.0045,
+      "f1": 0.0089
+    },
+    {
+      "training": "reduced",
+      "model": "Logistic Regression",
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.1642,
+      "f1": 0.2588
+    },
+    {
+      "training": "reduced",
+      "model": "Logistic Regression",
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.0045,
+      "f1": 0.009
+    },
+    {
+      "training": "reduced",
+      "model": "Logistic Regression",
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.1642,
+      "f1": 0.2588
+    },
+    {
+      "training": "reduced",
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.0315,
+      "f1": 0.0609
+    },
+    {
+      "training": "reduced",
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.209,
+      "f1": 0.2258
+    },
+    {
+      "training": "reduced",
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.0315,
+      "f1": 0.061
+    },
+    {
+      "training": "reduced",
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.209,
+      "f1": 0.2435
+    },
+    {
+      "training": "full",
+      "model": "Random Forest",
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.0378,
+      "f1": 0.0728
+    },
+    {
+      "training": "full",
+      "model": "Random Forest",
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.0299,
+      "f1": 0.0563
+    },
+    {
+      "training": "full",
+      "model": "Random Forest",
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.0378,
+      "f1": 0.0728
+    },
+    {
+      "training": "full",
+      "model": "Random Forest",
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.0299,
+      "f1": 0.0563
+    },
+    {
+      "training": "full",
+      "model": "XGBoost",
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.0461,
+      "f1": 0.0881
+    },
+    {
+      "training": "full",
+      "model": "XGBoost",
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.1493,
+      "f1": 0.25
+    },
+    {
+      "training": "full",
+      "model": "XGBoost",
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.0461,
+      "f1": 0.0881
+    },
+    {
+      "training": "full",
+      "model": "XGBoost",
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.1493,
+      "f1": 0.25
+    },
+    {
+      "training": "full",
+      "model": "Logistic Regression",
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.0028,
+      "f1": 0.0055
+    },
+    {
+      "training": "full",
+      "model": "Logistic Regression",
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.194,
+      "f1": 0.3171
+    },
+    {
+      "training": "full",
+      "model": "Logistic Regression",
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.0028,
+      "f1": 0.0055
+    },
+    {
+      "training": "full",
+      "model": "Logistic Regression",
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.194,
+      "f1": 0.3171
+    },
+    {
+      "training": "full",
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.0135,
+      "f1": 0.0266
+    },
+    {
+      "training": "full",
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.4179,
+      "f1": 0.1363
+    },
+    {
+      "training": "full",
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.0135,
+      "f1": 0.0266
+    },
+    {
+      "training": "full",
+      "model": "HistGradientBoosting",
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.4179,
+      "f1": 0.1518
+    }
+  ],
+  "imbalance": [
+    {
+      "method": "baseline",
+      "class": "R2L",
+      "recall": 0.041248,
+      "f1": 0.079201
+    },
+    {
+      "method": "baseline",
+      "class": "U2R",
+      "recall": 0.014925,
+      "f1": 0.029412
+    },
+    {
+      "method": "class_weight=balanced",
+      "class": "R2L",
+      "recall": 0.00104,
+      "f1": 0.002078
+    },
+    {
+      "method": "class_weight=balanced",
+      "class": "U2R",
+      "recall": 0.029851,
+      "f1": 0.057971
+    },
+    {
+      "method": "SMOTE",
+      "class": "R2L",
+      "recall": 0.04818,
+      "f1": 0.091901
+    },
+    {
+      "method": "SMOTE",
+      "class": "U2R",
+      "recall": 0.059701,
+      "f1": 0.106667
+    }
+  ],
+  "thresholds": {
+    "factors": {
+      "R2L": 5.0,
+      "U2R": 1.0
+    },
+    "validation_selection": [
+      {
+        "class": "R2L",
+        "validation_factor": 5.0,
+        "validation_f1": 0.9524
+      },
+      {
+        "class": "U2R",
+        "validation_factor": 1.0,
+        "validation_f1": 0.0
+      }
+    ],
+    "test_results": [
+      {
+        "test_set": "KDDTest+",
+        "state": "before",
+        "class": "R2L",
+        "recall": 0.06516464471403813,
+        "precision": 0.9894736842105263
+      },
+      {
+        "test_set": "KDDTest+",
+        "state": "before",
+        "class": "U2R",
+        "recall": 0.07462686567164178,
+        "precision": 0.7142857142857143
+      },
+      {
+        "test_set": "KDDTest+",
+        "state": "after",
+        "class": "R2L",
+        "recall": 0.10987868284228769,
+        "precision": 0.9694189602446484
+      },
+      {
+        "test_set": "KDDTest+",
+        "state": "after",
+        "class": "U2R",
+        "recall": 0.05970149253731343,
+        "precision": 0.6666666666666666
+      },
+      {
+        "test_set": "KDDTest-21",
+        "state": "before",
+        "class": "R2L",
+        "recall": 0.06516464471403813,
+        "precision": 0.9894736842105263
+      },
+      {
+        "test_set": "KDDTest-21",
+        "state": "before",
+        "class": "U2R",
+        "recall": 0.07462686567164178,
+        "precision": 0.7142857142857143
+      },
+      {
+        "test_set": "KDDTest-21",
+        "state": "after",
+        "class": "R2L",
+        "recall": 0.10987868284228769,
+        "precision": 0.9723926380368099
+      },
+      {
+        "test_set": "KDDTest-21",
+        "state": "after",
+        "class": "U2R",
+        "recall": 0.05970149253731343,
+        "precision": 0.6666666666666666
+      }
+    ]
+  },
+  "per_attack_r2l": [
+    {
+      "attack_name": "ftp_write",
+      "count": 3,
+      "recall": 0.3333333333333333,
+      "appears_in_training": true
+    },
+    {
+      "attack_name": "guess_passwd",
+      "count": 1231,
+      "recall": 0.0,
+      "appears_in_training": true
+    },
+    {
+      "attack_name": "httptunnel",
+      "count": 133,
+      "recall": 0.0,
+      "appears_in_training": false
+    },
+    {
+      "attack_name": "imap",
+      "count": 1,
+      "recall": 0.0,
+      "appears_in_training": true
+    },
+    {
+      "attack_name": "multihop",
+      "count": 18,
+      "recall": 0.05555555555555555,
+      "appears_in_training": true
+    },
+    {
+      "attack_name": "named",
+      "count": 17,
+      "recall": 0.0,
+      "appears_in_training": false
+    },
+    {
+      "attack_name": "phf",
+      "count": 2,
+      "recall": 0.5,
+      "appears_in_training": true
+    },
+    {
+      "attack_name": "sendmail",
+      "count": 14,
+      "recall": 0.0,
+      "appears_in_training": false
+    },
+    {
+      "attack_name": "snmpgetattack",
+      "count": 178,
+      "recall": 0.0,
+      "appears_in_training": false
+    },
+    {
+      "attack_name": "snmpguess",
+      "count": 331,
+      "recall": 0.0,
+      "appears_in_training": false
+    },
+    {
+      "attack_name": "warezmaster",
+      "count": 944,
+      "recall": 0.3326271186440678,
+      "appears_in_training": true
+    },
+    {
+      "attack_name": "xlock",
+      "count": 9,
+      "recall": 0.0,
+      "appears_in_training": false
+    },
+    {
+      "attack_name": "xsnoop",
+      "count": 4,
+      "recall": 0.0,
+      "appears_in_training": false
+    }
+  ],
+  "confusion_matrices": {
+    "class_order": [
+      "normal",
+      "DoS",
+      "Probe",
+      "R2L",
+      "U2R"
+    ],
+    "matrices": {
+      "KDDTest+": [
+        [
+          9419,
+          82,
+          206,
+          3,
+          1
+        ],
+        [
+          1192,
+          6195,
+          73,
+          0,
+          0
+        ],
+        [
+          775,
+          166,
+          1480,
+          0,
+          0
+        ],
+        [
+          2529,
+          1,
+          37,
+          317,
+          1
+        ],
+        [
+          56,
+          0,
+          0,
+          7,
+          4
+        ]
+      ],
+      "KDDTest-21": [
+        [
+          1861,
+          82,
+          206,
+          2,
+          1
+        ],
+        [
+          1192,
+          3079,
+          73,
+          0,
+          0
+        ],
+        [
+          775,
+          166,
+          1461,
+          0,
+          0
+        ],
+        [
+          2529,
+          1,
+          37,
+          317,
+          1
+        ],
+        [
+          56,
+          0,
+          0,
+          7,
+          4
+        ]
+      ]
+    }
+  },
+  "top15_importance": {
+    "random_forest_binary": [
+      {
+        "feature": "src_bytes",
+        "importance": 0.17965229973370772
+      },
+      {
+        "feature": "dst_bytes",
+        "importance": 0.10464091102011064
+      },
+      {
+        "feature": "same_srv_rate",
+        "importance": 0.0844452072609171
+      },
+      {
+        "feature": "dst_host_srv_count",
+        "importance": 0.06499555200871779
+      },
+      {
+        "feature": "flag",
+        "importance": 0.06432446553541449
+      },
+      {
+        "feature": "dst_host_same_srv_rate",
+        "importance": 0.06328182532900795
+      },
+      {
+        "feature": "logged_in",
+        "importance": 0.0466155825439349
+      },
+      {
+        "feature": "diff_srv_rate",
+        "importance": 0.039437677448100006
+      },
+      {
+        "feature": "dst_host_diff_srv_rate",
+        "importance": 0.0362012815301236
+      },
+      {
+        "feature": "protocol_type",
+        "importance": 0.03205742684007755
+      },
+      {
+        "feature": "count",
+        "importance": 0.03147719748137012
+      },
+      {
+        "feature": "srv_serror_rate",
+        "importance": 0.030120212639711368
+      },
+      {
+        "feature": "serror_rate",
+        "importance": 0.028132022633783067
+      },
+      {
+        "feature": "dst_host_same_src_port_rate",
+        "importance": 0.027984506952359912
+      },
+      {
+        "feature": "service",
+        "importance": 0.025723106372060326
+      }
+    ],
+    "xgboost": [
+      {
+        "feature": "numeric__same_srv_rate",
+        "importance": 0.4820423424243927
+      },
+      {
+        "feature": "numeric__diff_srv_rate",
+        "importance": 0.14014075696468353
+      },
+      {
+        "feature": "numeric__src_bytes",
+        "importance": 0.04824600741267204
+      },
+      {
+        "feature": "numeric__wrong_fragment",
+        "importance": 0.03149392828345299
+      },
+      {
+        "feature": "numeric__dst_host_diff_srv_rate",
+        "importance": 0.027575833722949028
+      },
+      {
+        "feature": "numeric__dst_bytes",
+        "importance": 0.026042671874165535
+      },
+      {
+        "feature": "numeric__dst_host_same_src_port_rate",
+        "importance": 0.025409463793039322
+      },
+      {
+        "feature": "numeric__dst_host_srv_diff_host_rate",
+        "importance": 0.02350451424717903
+      },
+      {
+        "feature": "numeric__srv_count",
+        "importance": 0.021634472534060478
+      },
+      {
+        "feature": "numeric__hot",
+        "importance": 0.020882371813058853
+      },
+      {
+        "feature": "numeric__num_compromised",
+        "importance": 0.019570473581552505
+      },
+      {
+        "feature": "numeric__logged_in",
+        "importance": 0.01813315972685814
+      },
+      {
+        "feature": "categorical__protocol_type",
+        "importance": 0.014661034569144249
+      },
+      {
+        "feature": "numeric__count",
+        "importance": 0.013924876227974892
+      },
+      {
+        "feature": "numeric__dst_host_serror_rate",
+        "importance": 0.012446923181414604
+      }
+    ]
+  },
+  "shap_plots": [
+    "shap\\final_xgboost_overall.png",
+    "shap\\final_xgboost_r2l.png",
+    "shap\\final_xgboost_u2r.png"
+  ],
+  "test_sizes": {
+    "reduced_train": {
+      "rows": 25192,
+      "raw_columns": 43,
+      "model_features": 41
+    },
+    "full_train": {
+      "rows": 125973,
+      "raw_columns": 43,
+      "model_features": 41
+    },
+    "KDDTest+": {
+      "rows": 22544,
+      "raw_columns": 43,
+      "model_features": 41
+    },
+    "KDDTest-21": {
+      "rows": 11850,
+      "raw_columns": 43,
+      "model_features": 41
+    }
+  },
+  "final_analysis": [
+    {
+      "test_set": "KDDTest+",
+      "class": "normal",
+      "recall": 0.9699310060755844,
+      "f1": 0.795456464825606
+    },
+    {
+      "test_set": "KDDTest+",
+      "class": "DoS",
+      "recall": 0.8304289544235925,
+      "f1": 0.8911104718066744
+    },
+    {
+      "test_set": "KDDTest+",
+      "class": "Probe",
+      "recall": 0.6113176373399422,
+      "f1": 0.7019207967749586
+    },
+    {
+      "test_set": "KDDTest+",
+      "class": "R2L",
+      "recall": 0.10987868284228769,
+      "f1": 0.19738480697384808
+    },
+    {
+      "test_set": "KDDTest+",
+      "class": "U2R",
+      "recall": 0.05970149253731343,
+      "f1": 0.1095890410958904
+    },
+    {
+      "test_set": "KDDTest-21",
+      "class": "normal",
+      "recall": 0.8647769516728625,
+      "f1": 0.434559252772913
+    },
+    {
+      "test_set": "KDDTest-21",
+      "class": "DoS",
+      "recall": 0.708793738489871,
+      "f1": 0.8026590198123045
+    },
+    {
+      "test_set": "KDDTest-21",
+      "class": "Probe",
+      "recall": 0.6082431307243963,
+      "f1": 0.6992103374012921
+    },
+    {
+      "test_set": "KDDTest-21",
+      "class": "R2L",
+      "recall": 0.10987868284228769,
+      "f1": 0.19744627841793833
+    },
+    {
+      "test_set": "KDDTest-21",
+      "class": "U2R",
+      "recall": 0.05970149253731343,
+      "f1": 0.1095890410958904
+    }
+  ]
+}

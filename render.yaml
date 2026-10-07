@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: nerd-nsl-kdd-api
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: MODEL_DIR
+        value: models
+      - key: EXPORT_DIR
+        value: exports
+      - key: PORT
+        value: "8000"
