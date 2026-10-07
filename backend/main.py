@@ -344,14 +344,16 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="NERD NSL-KDD API", version="1.0.0", lifespan=lifespan)
 origins = [
     origin.strip()
-    for origin in os.getenv("FRONTEND_ORIGIN", "http://localhost:5173").split(",")
+    for origin in os.getenv(
+        "FRONTEND_ORIGIN", "http://localhost:3000,http://localhost:5173"
+    ).split(",")
     if origin.strip()
 ]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 

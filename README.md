@@ -36,21 +36,51 @@ The complete workflow is in [`network-intrusion-detection-with-ml-nsl-kdd.ipynb`
 - Reports recall for every raw R2L attack name in KDDTest+
 - Saves the selected model, scaler, encoders, and metadata with `joblib`
 
-## Repository layout
+## Repository layout & documentation
+
+The project is structured as a full-stack production application:
 
 ```text
 .
-├── network-intrusion-detection-with-ml-nsl-kdd.ipynb
-├── nsl-kdd/
-│   ├── KDDTrain+_20Percent.txt
-│   ├── KDDTrain+.txt
-│   ├── KDDTest+.txt
-│   └── KDDTest-21.txt
-├── models/                         # Generated model artifacts
-└── README.md
+├── backend/                           # FastAPI service & endpoints (see backend/README.md)
+│   ├── main.py                        # App endpoints, prediction pipeline, CORS & validation
+│   ├── requirements.txt               # Backend dependencies
+│   └── README.md                      # Backend service guide
+├── frontend/                          # React + Vite web dashboard (see frontend/README.md)
+│   ├── src/                           # UI components, typed API client, design system
+│   ├── DESIGN.md                      # Complete design system specification
+│   ├── package.json                   # Web application dependencies
+│   └── README.md                      # Frontend application guide
+├── docs/
+│   └── api-contract.md                # Strict API specification and response contracts
+├── exports/                           # Committed metrics, schema, and SHAP explainability plots
+├── models/                            # Trained XGBoost models, preprocessors & encoders
+├── tests/                             # Backend integration & unit tests
+├── network-intrusion-detection-with-ml-nsl-kdd.ipynb # Research & modeling pipeline
+├── Dockerfile                         # Production containerization
+└── render.yaml                        # Cloud deployment blueprint
 ```
 
-The dataset files and generated `models/` artifacts are ignored by Git because they can be large.
+- **Backend Documentation:** [`backend/README.md`](backend/README.md)
+- **Frontend Documentation:** [`frontend/README.md`](frontend/README.md)
+- **API Contract:** [`docs/api-contract.md`](docs/api-contract.md)
+- **Design Tokens:** [`frontend/DESIGN.md`](frontend/DESIGN.md)
+
+## Full-stack quickstart
+
+### 1. Start the Backend API (Port 8000)
+```bash
+uv run uvicorn backend.main:app --reload --port 8000
+```
+Interactive docs: `http://localhost:8000/docs`.
+
+### 2. Start the Frontend Dashboard (Port 3000)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Web dashboard: `http://localhost:3000`.
 
 ## Dataset
 

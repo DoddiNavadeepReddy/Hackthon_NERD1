@@ -3,3 +3,11 @@ nsl-kdd/*.arff
 nsl-kdd/*.html
 nsl-kdd/*.jpg
 .env
+.env.local
+node_modules/
+dist/
+build/
+frontend/node_modules/
+frontend/dist/
+__pycache__/
+*.pyc

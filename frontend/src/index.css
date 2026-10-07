@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-pearl-white: #F6F5F1;
+  --bg-peach: #FAE7D5;
+  --bg-aqua-1: #E7F7F2;
+  --bg-aqua-2: #D3E8E2;
+  --bg-aqua-3: #C9EEE4;
+  --bg-aqua-4: #A9D2C7;
+  --panel-bg: #FFFFFF;
+  --panel-border: #EDEEEA;
+  --text-main: #2A2B2E;
+  --text-muted: #6B6D70;
+  --card-shadow: 0 10px 30px -5px rgba(42, 43, 46, 0.05), 0 4px 12px -2px rgba(42, 43, 46, 0.03);
+}
+
+.dark {
+  --bg-pearl-white: #161719;
+  --bg-peach: #251D18;
+  --bg-aqua-1: #172623;
+  --bg-aqua-2: #1B2F2A;
+  --bg-aqua-3: #1F3832;
+  --bg-aqua-4: #23423A;
+  --panel-bg: #202226;
+  --panel-border: #2E3036;
+  --text-main: #F3F4F6;
+  --text-muted: #9CA3AF;
+  --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), 0 4px 12px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Background Ombré mesh matching the design specification */
+.bg-mesh-gradient {
+  background-color: var(--bg-pearl-white);
+  background-image: 
+    radial-gradient(at 15% 90%, var(--bg-peach) 0px, transparent 55%),
+    radial-gradient(at 95% 45%, var(--bg-aqua-4) 0px, transparent 40%),
+    radial-gradient(at 85% 75%, var(--bg-aqua-3) 0px, transparent 50%),
+    radial-gradient(at 80% 20%, var(--bg-aqua-2) 0px, transparent 45%),
+    radial-gradient(at 65% 50%, var(--bg-aqua-1) 0px, transparent 50%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Single entrance animation: transform and opacity only */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-entrance {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Motion / Still preference control and reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.motion-still *, .motion-still ::before, .motion-still ::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Subtle custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #DADBD6;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #3B3E45;
+}
