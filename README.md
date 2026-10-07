@@ -21,6 +21,8 @@ The complete workflow is in [`network-intrusion-detection-with-ml-nsl-kdd.ipynb`
   - XGBoost
   - Logistic Regression
   - HistGradientBoosting
+- Selects the final model with stratified 5-fold cross-validation on reduced training data
+- Compares reduced versus full training on both test sets
 - Evaluates class imbalance with:
   - Baseline training
   - `class_weight="balanced"`
@@ -28,7 +30,10 @@ The complete workflow is in [`network-intrusion-detection-with-ml-nsl-kdd.ipynb`
 - Reports accuracy, macro F1, weighted F1, R2L recall, and U2R recall
 - Produces per-class recall/F1 charts and normalized confusion matrices
 - Preserves the Random Forest top-15 feature-importance chart
-- Generates SHAP explainability plots for the Random Forest overall and for R2L/U2R
+- Tunes R2L/U2R probability factors on a training-only validation split
+- Reports recall and precision before and after threshold tuning
+- Generates SHAP explainability plots for the CV-selected saved model
+- Reports recall for every raw R2L attack name in KDDTest+
 - Saves the selected model, scaler, encoders, and metadata with `joblib`
 
 ## Repository layout
@@ -57,7 +62,7 @@ Training uses:
 nsl-kdd/KDDTrain+_20Percent.txt
 ```
 
-The reduced training set is used for the reported model fitting workflow. The full training set is loaded for reference, but the notebook does not currently run a full-vs-reduced performance comparison or cross-validation. Evaluation uses:
+Both training files are evaluated in the full-vs-reduced comparison. Cross-validation and final-model selection use the reduced training set only. Evaluation uses:
 
 ```text
 nsl-kdd/KDDTest+.txt
@@ -95,7 +100,8 @@ All experiments use `random_state=42` where applicable.
 
 - Categorical columns (`protocol_type`, `service`, and `flag`) are encoded using encoders fitted on training data only.
 - Unknown test categories receive a reserved encoded value.
-- `StandardScaler` is fitted only on the reduced training set.
+- `StandardScaler` and categorical encoders are fitted independently on each training split.
+- Cross-validation fits preprocessing separately inside every fold.
 - SMOTE is fitted and applied only to the training matrix.
 - Test sets are never oversampled or used to fit preprocessing objects.
 - Attack-category mapping keeps unknown raw attack names as `other_attack`, preventing silent label loss.
@@ -106,16 +112,107 @@ The final save section creates `models/` and writes:
 
 ```text
 models/nsl_kdd_best_multiclass_model.joblib
-models/nsl_kdd_scaler.joblib
-models/nsl_kdd_feature_encoders.joblib
+models/nsl_kdd_preprocessor.joblib
+models/nsl_kdd_target_encoder.joblib
 models/nsl_kdd_metadata.joblib
 ```
 
-The best multi-class model is selected using macro F1 on `KDDTest+`. In the final executed notebook, Logistic Regression was selected.
+The final multi-class model is selected by mean macro F1 from stratified 5-fold CV on reduced training data. XGBoost was selected in the final run with mean CV macro F1 0.8847 (standard deviation 0.0493).
+
+The CV score is not a test-set or expected real-world score: its folds share the
+training distribution and attack mix, while both external test sets contain
+attack variants not seen in training.
 
 ## Results
 
-The following values are from the final executed comparison cell using the reduced training set and `random_state=42`:
+### Cross-validation model selection
+
+| Model | Mean macro F1 | Std. dev. |
+|---|---:|---:|
+| XGBoost | **0.8847** | 0.0493 |
+| Random Forest | 0.8513 | 0.0564 |
+| Logistic Regression | 0.7791 | 0.0681 |
+| HistGradientBoosting | 0.7645 | 0.0236 |
+
+### Full versus reduced training
+
+The following R2L/U2R values are from the executed comparison using `random_state=42`:
+
+| Training | Model | Test set | R2L recall | R2L F1 | U2R recall | U2R F1 |
+|---|---|---|---:|---:|---:|---:|
+| Reduced | RF | KDDTest+ | 0.0412 | 0.0792 | 0.0149 | 0.0294 |
+| Reduced | XGBoost | KDDTest+ | 0.0641 | 0.1204 | 0.0746 | 0.1351 |
+| Reduced | Logistic Regression | KDDTest+ | 0.0045 | 0.0089 | 0.1642 | 0.2588 |
+| Reduced | HistGradientBoosting | KDDTest+ | 0.0315 | 0.0609 | 0.2090 | 0.2258 |
+| Full | RF | KDDTest+ | 0.0378 | 0.0728 | 0.0299 | 0.0563 |
+| Full | XGBoost | KDDTest+ | 0.0461 | 0.0881 | 0.1493 | 0.2500 |
+| Full | Logistic Regression | KDDTest+ | 0.0028 | 0.0055 | 0.1940 | 0.3171 |
+| Full | HistGradientBoosting | KDDTest+ | 0.0135 | 0.0266 | 0.4179 | 0.1363 |
+| Reduced | RF | KDDTest-21 | 0.0412 | 0.0792 | 0.0149 | 0.0294 |
+| Reduced | XGBoost | KDDTest-21 | 0.0641 | 0.1204 | 0.0746 | 0.1351 |
+| Reduced | Logistic Regression | KDDTest-21 | 0.0045 | 0.0090 | 0.1642 | 0.2588 |
+| Reduced | HistGradientBoosting | KDDTest-21 | 0.0315 | 0.0610 | 0.2090 | 0.2435 |
+| Full | RF | KDDTest-21 | 0.0378 | 0.0728 | 0.0299 | 0.0563 |
+| Full | XGBoost | KDDTest-21 | 0.0461 | 0.0881 | 0.1493 | 0.2500 |
+| Full | Logistic Regression | KDDTest-21 | 0.0028 | 0.0055 | 0.1940 | 0.3171 |
+| Full | HistGradientBoosting | KDDTest-21 | 0.0135 | 0.0266 | 0.4179 | 0.1518 |
+
+### Final-model per-class metrics
+
+The final XGBoost model was refit on all reduced training rows. Test predictions use the validation-tuned R2L factor of 5.0 and U2R factor of 1.0:
+
+| Test set | Class/summary | Recall | F1 | Accuracy | Macro F1 |
+|---|---|---:|---:|---:|---:|
+| KDDTest+ | normal | 0.9699 | 0.7955 | — | — |
+| KDDTest+ | DoS | 0.8304 | 0.8911 | — | — |
+| KDDTest+ | Probe | 0.6113 | 0.7019 | — | — |
+| KDDTest+ | R2L | 0.1099 | 0.1974 | — | — |
+| KDDTest+ | U2R | 0.0597 | 0.1096 | — | — |
+| KDDTest+ | Overall | — | — | 0.7725 | 0.5391 |
+| KDDTest-21 | normal | 0.8648 | 0.4346 | — | — |
+| KDDTest-21 | DoS | 0.7088 | 0.8027 | — | — |
+| KDDTest-21 | Probe | 0.6082 | 0.6992 | — | — |
+| KDDTest-21 | R2L | 0.1099 | 0.1974 | — | — |
+| KDDTest-21 | U2R | 0.0597 | 0.1096 | — | — |
+| KDDTest-21 | Overall | — | — | 0.5673 | 0.4487 |
+
+### KDDTest+ raw R2L analysis
+
+| Attack name | Count | Recall | In reduced training |
+|---|---:|---:|:---:|
+| ftp_write | 3 | 0.3333 | Yes |
+| guess_passwd | 1231 | 0.0000 | Yes |
+| httptunnel | 133 | 0.0000 | No |
+| imap | 1 | 0.0000 | Yes |
+| multihop | 18 | 0.0556 | Yes |
+| named | 17 | 0.0000 | No |
+| phf | 2 | 0.5000 | Yes |
+| sendmail | 14 | 0.0000 | No |
+| snmpgetattack | 178 | 0.0000 | No |
+| snmpguess | 331 | 0.0000 | No |
+| warezmaster | 944 | 0.3326 | Yes |
+| xlock | 9 | 0.0000 | No |
+| xsnoop | 4 | 0.0000 | No |
+
+### Threshold tuning
+
+Factors were selected using a stratified validation split from reduced training only:
+
+| Class | Factor |
+|---|---:|
+| R2L | 5.0 |
+| U2R | 1.0 |
+
+| Test set | Class | Recall before | Precision before | Recall after | Precision after |
+|---|---|---:|---:|---:|---:|
+| KDDTest+ | R2L | 0.0652 | 0.9895 | 0.1099 | 0.9694 |
+| KDDTest+ | U2R | 0.0746 | 0.7143 | 0.0597 | 0.6667 |
+| KDDTest-21 | R2L | 0.0652 | 0.9895 | 0.1099 | 0.9724 |
+| KDDTest-21 | U2R | 0.0746 | 0.7143 | 0.0597 | 0.6667 |
+
+### Earlier baseline comparison
+
+The following values are retained from the earlier test-set comparison for reference:
 
 | Model | Test set | Accuracy | Macro F1 | Weighted F1 | R2L recall | U2R recall |
 |---|---|---:|---:|---:|---:|---:|
@@ -147,15 +244,16 @@ This work builds on **Piyush Kumar's Kaggle NSL-KDD notebook**. The team added l
 
 ## Interpretation
 
-- DoS and Probe are detected far better than R2L and U2R. For the selected Logistic Regression model on `KDDTest+`, recall is 0.79 for DoS and 0.74 for Probe, versus 0.0045 for R2L and 0.164 for U2R.
-- R2L is the hardest class. Across all four models, `KDDTest+` R2L recall ranges from 0.0045 to 0.0641 despite 2,885 R2L test rows. The reduced training set contains only 209 R2L rows, and many test-set R2L names, including `snmpguess`, `sendmail`, `xlock`, and `httptunnel`, do not appear in training.
+- DoS and Probe are detected substantially better than R2L and U2R. For the final tuned XGBoost model on `KDDTest+`, recall is 0.8304 for DoS and 0.6113 for Probe, versus 0.1099 for R2L and 0.0597 for U2R.
+- R2L remains the hardest class. In the full-vs-reduced comparison, R2L recall varies widely with training data and model; full-data HistGradientBoosting reaches 0.0135, while reduced Logistic Regression reaches 0.0045.
+- `guess_passwd` illustrates that known attack names can still be missed: it has 1,231 KDDTest+ rows, appears in reduced training, and has recall 0.0000.
 - U2R results are noisy: there are only 11 U2R training rows and 67 test rows, so one additional correct prediction changes recall by approximately 1.5 percentage points.
 - Imbalance handling helped little. SMOTE raised Random Forest R2L recall from 0.041 to 0.048 and U2R recall from 0.015 to 0.060, while `class_weight="balanced"` lowered R2L recall to 0.001.
-- On the harder `KDDTest-21` split, accuracy falls to 0.50-0.56 across the compared models.
+- On the harder `KDDTest-21` split, final-model DoS recall falls from 0.8304 to 0.7088, while R2L and U2R recall remain 0.1099 and 0.0597.
 
 ### SHAP scope
 
-The SHAP plots explain the Random Forest model, not the saved Logistic Regression model. Because Random Forest detects very few R2L records, its R2L SHAP plot describes the features associated with the small number of R2L records it does detect, rather than a complete explanation of R2L behavior.
+The SHAP plots explain the same CV-selected XGBoost model that is saved. The multi-class SHAP output had shape `(2000, 41, 5)` in the final run.
 
 ## Limitations
 
@@ -163,7 +261,8 @@ The SHAP plots explain the Random Forest model, not the saved Logistic Regressio
 - R2L and U2R are severely underrepresented. In the reduced training split, U2R has only 11 rows; `KDDTest+` contains 67 U2R rows.
 - The test sets contain attack names that are not present in the reduced training rows. The notebook maps recognized names into their attack family and reserves `other_attack` for names outside the category dictionary.
 - `KDDTest-21` is intentionally harder because easier records were removed, so its performance is not directly comparable to a production deployment estimate.
-- The current notebook does not include cross-validation or a measured full-vs-reduced training comparison.
+- Threshold factors are selected on a validation split that lacks the unseen attack names present in the test sets, so they may not transfer to new attack variants.
+- The final model and SHAP explanations use reduced training data; the full-data comparison is reported, but the full-data model is not selected for the saved artifact.
 
 ## License and attribution
 
