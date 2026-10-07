@@ -264,6 +264,34 @@ The SHAP plots explain the same CV-selected XGBoost model that is saved. The mul
 - Threshold factors are selected on a validation split that lacks the unseen attack names present in the test sets, so they may not transfer to new attack variants.
 - The final model and SHAP explanations use reduced training data; the full-data comparison is reported, but the full-data model is not selected for the saved artifact.
 
+## FastAPI service
+
+The backend serves the saved XGBoost model and the executed notebook results:
+
+```bash
+pip install -r requirements.txt
+uvicorn backend.main:app --reload --port 8000
+```
+
+Run that command from the repository root. If your current directory is
+`backend`, the equivalent command is:
+
+```bash
+uvicorn app.main:app --port 8000
+```
+
+Run the API tests with:
+
+```bash
+pytest -q
+```
+
+The API contract is documented in [`docs/api-contract.md`](docs/api-contract.md).
+Docker and Render configuration are provided in [`Dockerfile`](Dockerfile) and
+[`render.yaml`](render.yaml). Model artifacts and exported results are ignored
+or supplied as deployment assets; Git LFS is the recommended way to version
+large model files.
+
 ## License and attribution
 
 This repository contains a notebook-based NSL-KDD machine-learning workflow. Confirm the applicable license and attribution requirements for the NSL-KDD dataset before redistribution.
