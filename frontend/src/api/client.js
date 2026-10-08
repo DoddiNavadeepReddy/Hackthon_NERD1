@@ -278,5 +278,5 @@ export async function predictBatch(file) {
  */
 export function getShapImageUrl(filename) {
   const cleanName = filename.replace(/^exports\/shap\//, '').replace(/^\/static\/shap\//, '');
-  return `${getApiBaseUrl()}/static/shap/${cleanName}`;
+  return `/static/shap/${cleanName}`;
 }
