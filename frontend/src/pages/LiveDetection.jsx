@@ -100,45 +100,48 @@ const DEFAULT_PRESETS = {
   }
 };
 
+function formatDuration(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
 export default function LiveDetection() {
   const [streamActive, setStreamActive] = useState(false);
   const [streamSpeed, setStreamSpeed] = useState(2500); // ms
+  const [streamElapsed, setStreamElapsed] = useState(0); // seconds active
+  const [countdown, setCountdown] = useState(2.5); // countdown to next packet
+  const [autoFollow, setAutoFollow] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [packets, setPackets] = useState([]);
   const [selectedPacket, setSelectedPacket] = useState(null);
   const [filterClass, setFilterClass] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sampleBank, setSampleBank] = useState({});
   const [crafterOpen, setCrafterOpen] = useState(false);
   const [craftingData, setCraftingData] = useState(DEFAULT_PRESETS.normal);
   const [analyzingManual, setAnalyzingManual] = useState(false);
-  const streamTimerRef = useRef(null);
+
+  const sampleBankRef = useRef({});
+  const autoFollowRef = useRef(autoFollow);
+  const isProcessingRef = useRef(false);
+  const nextTriggerTimeRef = useRef(0);
+  const loopTimeoutRef = useRef(null);
+  const countdownIntervalRef = useRef(null);
+  const elapsedIntervalRef = useRef(null);
   const packetIdCounter = useRef(1);
 
-  // Pre-fetch diverse real benchmark samples for authentic streaming
   useEffect(() => {
-    async function fetchSamples() {
-      const bank = {};
-      for (const cat of CLASS_DISPLAY_ORDER) {
-        try {
-          const res = await getSamples(cat, 8);
-          if (res?.items?.length) {
-            bank[cat] = res.items;
-          }
-        } catch {
-          // fallback to presets
-        }
-      }
-      setSampleBank(bank);
-    }
-    fetchSamples();
-  }, []);
+    autoFollowRef.current = autoFollow;
+  }, [autoFollow]);
 
   // Process and analyze an incoming packet
-  const processPacket = useCallback(async (rawFeatures, originType = 'Stream') => {
+  const processPacket = useCallback(async (rawFeatures, originType = 'Stream', forceSelect = false) => {
+    isProcessingRef.current = true;
+    setIsProcessing(true);
     const startTime = performance.now();
     try {
       const prediction = await predict(rawFeatures, 'full');
-      const latencyMs = Math.round(performance.now() - startTime);
+      const latencyMs = Math.max(1, Math.round(performance.now() - startTime));
 
       const packetRecord = {
         id: packetIdCounter.current++,
@@ -152,9 +155,11 @@ export default function LiveDetection() {
         confidence: Math.round((prediction.probabilities?.[prediction.predicted_class] || 0) * 100),
       };
 
-      setPackets(prev => [packetRecord, ...prev.slice(0, 49)]); // keep latest 50
-      if (!selectedPacket) {
+      setPackets(prev => [packetRecord, ...prev.slice(0, 49)]);
+      if (forceSelect || autoFollowRef.current) {
         setSelectedPacket(packetRecord);
+      } else {
+        setSelectedPacket(prev => prev || packetRecord);
       }
       return packetRecord;
     } catch {
@@ -197,35 +202,87 @@ export default function LiveDetection() {
       };
 
       setPackets(prev => [packetRecord, ...prev.slice(0, 49)]);
-      if (!selectedPacket) {
+      if (forceSelect || autoFollowRef.current) {
         setSelectedPacket(packetRecord);
+      } else {
+        setSelectedPacket(prev => prev || packetRecord);
       }
       return packetRecord;
+    } finally {
+      isProcessingRef.current = false;
+      setIsProcessing(false);
     }
-  }, [selectedPacket]);
+  }, []);
 
   // Inject a specific attack type or normal packet
-  const handleInject = useCallback(async (category) => {
-    const pool = sampleBank[category] || [];
+  const handleInject = useCallback(async (category, forceSelect = false) => {
+    const pool = sampleBankRef.current[category] || [];
     const source = pool.length > 0
       ? pool[Math.floor(Math.random() * pool.length)]
       : DEFAULT_PRESETS[category] || DEFAULT_PRESETS.normal;
 
-    const record = await processPacket(source, `Inject (${category})`);
-    if (record) {
-      setSelectedPacket(record);
-    }
-  }, [sampleBank, processPacket]);
+    return processPacket(source, `Inject (${category})`, forceSelect);
+  }, [processPacket]);
 
-  // Streaming loop
+  // Pre-fetch samples and pre-populate initial packets on mount
+  useEffect(() => {
+    let mounted = true;
+    async function initSamples() {
+      const bank = {};
+      for (const cat of CLASS_DISPLAY_ORDER) {
+        try {
+          const res = await getSamples(cat, 8);
+          if (res?.items?.length) {
+            bank[cat] = res.items;
+          }
+        } catch {
+          // fallback to presets
+        }
+      }
+      if (mounted) {
+        sampleBankRef.current = bank;
+        // Inject 2 baseline packets on mount so screen is instantly populated
+        handleInject('normal', true);
+        setTimeout(() => {
+          if (mounted) handleInject('DoS', false);
+        }, 200);
+      }
+    }
+    initSamples();
+    return () => {
+      mounted = false;
+    };
+  }, [handleInject]);
+
+  // Streaming loop with countdown & elapsed timer
   useEffect(() => {
     if (!streamActive) {
-      if (streamTimerRef.current) clearInterval(streamTimerRef.current);
+      if (loopTimeoutRef.current) clearTimeout(loopTimeoutRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
+      setCountdown(Number((streamSpeed / 1000).toFixed(1)));
       return;
     }
 
-    const triggerNext = () => {
-      // 65% normal traffic, 20% DoS, 10% Probe, 4% R2L, 1% U2R
+    let isCancelled = false;
+    nextTriggerTimeRef.current = Date.now() + streamSpeed;
+    setCountdown(Number((streamSpeed / 1000).toFixed(1)));
+
+    // Countdown tick interval (every 100ms)
+    countdownIntervalRef.current = setInterval(() => {
+      const remainingMs = Math.max(0, nextTriggerTimeRef.current - Date.now());
+      setCountdown(Number((remainingMs / 1000).toFixed(1)));
+    }, 100);
+
+    // Elapsed active stream timer (every second)
+    elapsedIntervalRef.current = setInterval(() => {
+      setStreamElapsed(prev => prev + 1);
+    }, 1000);
+
+    // Sequential streaming loop
+    const runStreamTick = async () => {
+      if (isCancelled) return;
+
       const rand = Math.random();
       let chosen = 'normal';
       if (rand > 0.95) chosen = 'U2R';
@@ -233,15 +290,23 @@ export default function LiveDetection() {
       else if (rand > 0.70) chosen = 'Probe';
       else if (rand > 0.50) chosen = 'DoS';
 
-      handleInject(chosen);
+      await handleInject(chosen, false);
+
+      if (!isCancelled) {
+        nextTriggerTimeRef.current = Date.now() + streamSpeed;
+        setCountdown(Number((streamSpeed / 1000).toFixed(1)));
+        loopTimeoutRef.current = setTimeout(runStreamTick, streamSpeed);
+      }
     };
 
-    // run first immediately
-    triggerNext();
-    streamTimerRef.current = setInterval(triggerNext, streamSpeed);
+    // Trigger immediate first packet
+    runStreamTick();
 
     return () => {
-      if (streamTimerRef.current) clearInterval(streamTimerRef.current);
+      isCancelled = true;
+      if (loopTimeoutRef.current) clearTimeout(loopTimeoutRef.current);
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+      if (elapsedIntervalRef.current) clearInterval(elapsedIntervalRef.current);
     };
   }, [streamActive, streamSpeed, handleInject]);
 
@@ -250,7 +315,7 @@ export default function LiveDetection() {
     e.preventDefault();
     setAnalyzingManual(true);
     try {
-      const record = await processPacket(craftingData, 'Custom Crafter');
+      const record = await processPacket(craftingData, 'Custom Crafter', true);
       if (record) {
         setSelectedPacket(record);
         setCrafterOpen(false);
@@ -258,6 +323,14 @@ export default function LiveDetection() {
     } finally {
       setAnalyzingManual(false);
     }
+  };
+
+  const handleReset = () => {
+    setStreamActive(false);
+    setStreamElapsed(0);
+    setPackets([]);
+    setSelectedPacket(null);
+    setCountdown(Number((streamSpeed / 1000).toFixed(1)));
   };
 
   // Telemetry aggregates
@@ -353,10 +426,7 @@ export default function LiveDetection() {
 
             {/* Reset / Clear */}
             <button
-              onClick={() => {
-                setPackets([]);
-                setSelectedPacket(null);
-              }}
+              onClick={handleReset}
               title="Clear packet history"
               className="p-2 rounded-xl border border-[#DADBD6] dark:border-[#3B3E45] text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 bg-white dark:bg-[#202226] hover:bg-[#F6F5F1] transition-colors"
             >
@@ -365,6 +435,58 @@ export default function LiveDetection() {
           </div>
         </div>
 
+        {/* Live Stream Telemetry & Timer HUD when active */}
+        {streamActive && (
+          <div className="mt-4 pt-4 border-t border-[#EDEEEA] dark:border-[#2E3036] flex flex-wrap items-center justify-between gap-3 bg-emerald-50/60 dark:bg-emerald-950/20 px-3.5 py-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/40">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 font-mono tracking-wide">
+                  {isProcessing ? 'PROCESSING PACKET...' : 'STREAMING LIVE'}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-700 dark:text-zinc-300 bg-white dark:bg-[#202226] px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-xs">
+                <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                <span>Timer: <strong>{formatDuration(streamElapsed)}</strong></span>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs font-mono bg-white dark:bg-[#202226] px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-xs">
+                <span className="text-zinc-500">Next packet:</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 w-8">{countdown.toFixed(1)}s</span>
+                <div className="w-16 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-100"
+                    style={{ width: `${Math.min(100, Math.max(0, ((streamSpeed - countdown * 1000) / streamSpeed) * 100))}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  const next = !autoFollow;
+                  setAutoFollow(next);
+                  if (next && packets.length > 0) {
+                    setSelectedPacket(packets[0]);
+                  }
+                }}
+                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  autoFollow
+                    ? 'bg-emerald-600 text-white font-semibold shadow-xs'
+                    : 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                }`}
+              >
+                {autoFollow ? 'Auto-Follow: ON' : 'Auto-Follow: PAUSED (Click to Resume)'}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Attack Injection Fast-Triggers */}
         <div className="mt-4 pt-4 border-t border-[#EDEEEA] dark:border-[#2E3036] flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-mono uppercase tracking-wider text-[#6B6D70] dark:text-gray-400 mr-1 flex items-center gap-1">
@@ -372,37 +494,38 @@ export default function LiveDetection() {
             Inject Preset:
           </span>
           <button
-            onClick={() => handleInject('normal')}
+            onClick={() => handleInject('normal', true)}
             className="px-2.5 py-1 rounded-lg text-xs font-medium border border-[#DADBD6] dark:border-[#3B3E45] bg-[#F6F5F1] dark:bg-[#161719] hover:border-zinc-400 text-zinc-700 dark:text-zinc-200 transition-colors"
           >
             + Normal Web
           </button>
           <button
-            onClick={() => handleInject('DoS')}
+            onClick={() => handleInject('DoS', true)}
             className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 hover:bg-rose-100 transition-colors"
           >
             + DoS (SYN Flood)
           </button>
           <button
-            onClick={() => handleInject('Probe')}
+            onClick={() => handleInject('Probe', true)}
             className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-amber-200 dark:border-amber-900/60 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 hover:bg-amber-100 transition-colors"
           >
             + Probe (Portscan)
           </button>
           <button
-            onClick={() => handleInject('R2L')}
+            onClick={() => handleInject('R2L', true)}
             className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-purple-200 dark:border-purple-900/60 bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300 hover:bg-purple-100 transition-colors"
           >
             + R2L (Password Guess)
           </button>
           <button
-            onClick={() => handleInject('U2R')}
+            onClick={() => handleInject('U2R', true)}
             className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-orange-200 dark:border-orange-900/60 bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-300 hover:bg-orange-100 transition-colors"
           >
             + U2R (Privilege Escalation)
           </button>
         </div>
       </div>
+
 
       {/* Telemetry Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -727,7 +850,12 @@ export default function LiveDetection() {
                     return (
                       <tr
                         key={pkt.id}
-                        onClick={() => setSelectedPacket(pkt)}
+                        onClick={() => {
+                          setSelectedPacket(pkt);
+                          if (streamActive) {
+                            setAutoFollow(false);
+                          }
+                        }}
                         className={`cursor-pointer transition-colors ${
                           isSelected
                             ? 'bg-zinc-100 dark:bg-zinc-800/80 font-semibold'
@@ -781,6 +909,24 @@ export default function LiveDetection() {
         <div className="lg:col-span-5 bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl shadow-sm p-6 sticky top-24">
           {selectedPacket ? (
             <div className="space-y-6">
+              {streamActive && !autoFollow && (
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200">
+                  <div className="flex items-center gap-1.5 font-mono">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                    <span>Inspecting Packet #{selectedPacket.id}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setAutoFollow(true);
+                      if (packets.length > 0) setSelectedPacket(packets[0]);
+                    }}
+                    className="px-2 py-0.5 rounded-lg bg-amber-200 dark:bg-amber-800 hover:bg-amber-300 font-semibold text-[11px] transition-colors"
+                  >
+                    Resume Live Follow &rarr;
+                  </button>
+                </div>
+              )}
+
               {/* Verdict Banner */}
               <div
                 className="p-4 rounded-xl border flex items-center justify-between"
