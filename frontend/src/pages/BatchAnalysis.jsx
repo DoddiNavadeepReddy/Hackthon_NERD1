@@ -413,23 +413,23 @@ export default function BatchAnalysis() {
       {/* Batch Results Overview */}
       {results && (
         <div className="space-y-6">
-          {/* Summary Metric Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm">
+          {/* Summary Metric Cards - Equal 115px Heights */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-stretch">
+            <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm h-[115px] flex flex-col justify-between">
               <span className="text-[11px] font-mono text-[#6B6D70] dark:text-gray-400 uppercase block">
                 Total Processed
               </span>
-              <div className="text-2xl font-bold font-display text-[#2A2B2E] dark:text-white mt-1">
+              <div className="text-2xl font-bold font-display text-[#2A2B2E] dark:text-white">
                 {totalRows.toLocaleString()}
               </div>
               <span className="text-[11px] text-zinc-400">Records ingested</span>
             </div>
 
-            <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm">
+            <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm h-[115px] flex flex-col justify-between">
               <span className="text-[11px] font-mono text-[#6B6D70] dark:text-gray-400 uppercase block">
                 Detected Attacks
               </span>
-              <div className="text-2xl font-bold font-display text-rose-600 dark:text-rose-400 mt-1">
+              <div className="text-2xl font-bold font-display text-rose-600 dark:text-rose-400">
                 {attackRows.toLocaleString()}
               </div>
               <span className="text-[11px] text-zinc-400">
@@ -438,23 +438,23 @@ export default function BatchAnalysis() {
             </div>
 
             {hasLabels && (
-              <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm">
+              <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm h-[115px] flex flex-col justify-between">
                 <span className="text-[11px] font-mono text-[#6B6D70] dark:text-gray-400 uppercase block">
                   Ground-Truth Accuracy
                 </span>
-                <div className="text-2xl font-bold font-display text-emerald-600 dark:text-emerald-400 mt-1">
+                <div className="text-2xl font-bold font-display text-emerald-600 dark:text-emerald-400">
                   {accuracyPct}%
                 </div>
                 <span className="text-[11px] text-zinc-400">Label verification</span>
               </div>
             )}
 
-            <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm">
-              <div className="flex items-center justify-between text-[11px] font-mono text-[#6B6D70] dark:text-gray-400 uppercase mb-1">
+            <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm h-[115px] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[11px] font-mono text-[#6B6D70] dark:text-gray-400 uppercase">
                 <span>Class Distribution</span>
                 <Layers className="w-3.5 h-3.5 text-zinc-400" />
               </div>
-              <div className="flex items-center gap-1 mt-2">
+              <div className="flex items-center gap-1 py-1">
                 {CLASS_DISPLAY_ORDER.map(cls => {
                   const count = results.counts?.[cls] || 0;
                   const pct = totalRows > 0 ? (count / totalRows) * 100 : 0;
@@ -474,6 +474,7 @@ export default function BatchAnalysis() {
                   );
                 })}
               </div>
+              <span className="text-[11px] text-zinc-400 truncate">NSL-KDD 5-class</span>
             </div>
           </div>
 

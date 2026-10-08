@@ -527,53 +527,53 @@ export default function LiveDetection() {
       </div>
 
 
-      {/* Telemetry Stat Cards */}
+      {/* Telemetry Stat Cards - All 4 with identical height */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-[#6B6D70] dark:text-gray-400 mb-1">
+        <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm flex flex-col justify-between h-[115px]">
+          <div className="flex items-center justify-between text-xs text-[#6B6D70] dark:text-gray-400">
             <span>PACKETS INSPECTED</span>
             <Activity className="w-4 h-4 text-[#6B6D70]" />
           </div>
           <div className="text-2xl font-bold font-display text-[#2A2B2E] dark:text-white">
             {totalCount}
           </div>
-          <p className="text-[11px] text-[#6B6D70] dark:text-gray-400 mt-0.5">
+          <p className="text-[11px] text-[#6B6D70] dark:text-gray-400">
             Buffer window: latest 50
           </p>
         </div>
 
-        <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-[#6B6D70] dark:text-gray-400 mb-1">
+        <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm flex flex-col justify-between h-[115px]">
+          <div className="flex items-center justify-between text-xs text-[#6B6D70] dark:text-gray-400">
             <span>THREATS MITIGATED</span>
             <ShieldAlert className="w-4 h-4 text-rose-500" />
           </div>
           <div className="text-2xl font-bold font-display text-rose-600 dark:text-rose-400">
             {attackCount}
           </div>
-          <p className="text-[11px] text-[#6B6D70] dark:text-gray-400 mt-0.5">
+          <p className="text-[11px] text-[#6B6D70] dark:text-gray-400">
             Threat ratio: <strong className="text-[#2A2B2E] dark:text-white">{threatRate}%</strong>
           </p>
         </div>
 
-        <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-[#6B6D70] dark:text-gray-400 mb-1">
+        <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm flex flex-col justify-between h-[115px]">
+          <div className="flex items-center justify-between text-xs text-[#6B6D70] dark:text-gray-400">
             <span>INSPECTION LATENCY</span>
             <Cpu className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="text-2xl font-bold font-display text-[#2A2B2E] dark:text-white">
             {avgLatency} <span className="text-sm font-normal text-zinc-500">ms</span>
           </div>
-          <p className="text-[11px] text-[#6B6D70] dark:text-gray-400 mt-0.5">
+          <p className="text-[11px] text-[#6B6D70] dark:text-gray-400">
             Model pipeline + SHAP
           </p>
         </div>
 
-        <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-[#6B6D70] dark:text-gray-400 mb-1">
+        <div className="bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl p-4 shadow-sm flex flex-col justify-between h-[115px]">
+          <div className="flex items-center justify-between text-xs text-[#6B6D70] dark:text-gray-400">
             <span>ATTACK DISTRIBUTION</span>
             <Layers className="w-4 h-4 text-purple-500" />
           </div>
-          <div className="flex items-center gap-1.5 mt-2">
+          <div className="flex items-center gap-1.5 py-1">
             {CLASS_DISPLAY_ORDER.map(cls => {
               const count = packets.filter(p => p.verdict === cls).length;
               return (
@@ -592,8 +592,12 @@ export default function LiveDetection() {
               );
             })}
           </div>
+          <p className="text-[11px] text-[#6B6D70] dark:text-gray-400 truncate">
+            {CLASS_DISPLAY_ORDER.join(' · ')}
+          </p>
         </div>
       </div>
+
 
       {/* Manual Packet Crafter Modal / Panel */}
       {crafterOpen && (
@@ -760,12 +764,12 @@ export default function LiveDetection() {
         </div>
       )}
 
-      {/* Main Split: Left = Live Flow Table, Right = Deep Packet Inspector */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left: Feed Table (7 cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl shadow-sm overflow-hidden flex flex-col">
+      {/* Main Split: Left = Live Flow Table, Right = Deep Packet Inspector - EXACT SAME HEIGHT */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Left: Feed Table (7 cols) - Matching 730px Height */}
+        <div className="lg:col-span-7 bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[480px] lg:h-[730px]">
           {/* Table Header & Controls */}
-          <div className="p-4 border-b border-[#EDEEEA] dark:border-[#2E3036] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 border-b border-[#EDEEEA] dark:border-[#2E3036] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
             <div className="flex items-center gap-2">
               <h2 className="font-display font-bold text-base text-[#2A2B2E] dark:text-white">
                 Live Connection Log
@@ -799,7 +803,7 @@ export default function LiveDetection() {
           </div>
 
           {/* Search bar */}
-          <div className="px-4 py-2 bg-[#F6F5F1]/50 dark:bg-[#161719]/40 border-b border-[#EDEEEA] dark:border-[#2E3036] flex items-center gap-2 text-xs">
+          <div className="px-4 py-2 bg-[#F6F5F1]/50 dark:bg-[#161719]/40 border-b border-[#EDEEEA] dark:border-[#2E3036] flex items-center gap-2 text-xs shrink-0">
             <Search className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
             <input
               type="text"
@@ -815,8 +819,8 @@ export default function LiveDetection() {
             )}
           </div>
 
-          {/* Table Content */}
-          <div className="overflow-x-auto max-h-[580px] overflow-y-auto divide-y divide-[#EDEEEA] dark:divide-[#2E3036]">
+          {/* Table Content - Flex Fill to match exactly 730px */}
+          <div className="overflow-x-auto flex-1 overflow-y-auto divide-y divide-[#EDEEEA] dark:divide-[#2E3036]">
             {filteredPackets.length === 0 ? (
               <div className="p-12 text-center text-[#6B6D70] dark:text-gray-400 text-xs">
                 {totalCount === 0 ? (
@@ -905,12 +909,12 @@ export default function LiveDetection() {
           </div>
         </div>
 
-        {/* Right: Deep Packet Inspector (5 cols) */}
-        <div className="lg:col-span-5 bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl shadow-sm p-6 sticky top-24">
+        {/* Right: Deep Packet Inspector (5 cols) - Matching exactly 730px Height */}
+        <div className="lg:col-span-5 bg-white dark:bg-[#202226] border border-[#EDEEEA] dark:border-[#2E3036] rounded-2xl shadow-sm p-5 flex flex-col min-h-[480px] lg:h-[730px] overflow-hidden">
           {selectedPacket ? (
-            <div className="space-y-6">
+            <div className="flex flex-col h-full space-y-3 overflow-y-auto pr-1 -mr-1">
               {streamActive && !autoFollow && (
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200">
+                <div className="flex items-center justify-between p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 shrink-0">
                   <div className="flex items-center gap-1.5 font-mono">
                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                     <span>Inspecting Packet #{selectedPacket.id}</span>
@@ -929,7 +933,7 @@ export default function LiveDetection() {
 
               {/* Verdict Banner */}
               <div
-                className="p-4 rounded-xl border flex items-center justify-between"
+                className="p-3.5 rounded-xl border flex items-center justify-between shrink-0"
                 style={{
                   backgroundColor: `${CLASS_COLORS[selectedPacket.verdict]}10`,
                   borderColor: `${CLASS_COLORS[selectedPacket.verdict]}40`
@@ -956,12 +960,12 @@ export default function LiveDetection() {
                       {selectedPacket.isAttack ? 'Host Intrusion' : 'Benign Traffic'}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-300 mt-1">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300 mt-0.5">
                     {CLASS_DESCRIPTIONS[selectedPacket.verdict]}
                   </p>
                 </div>
 
-                <div className="text-right">
+                <div className="text-right shrink-0">
                   <span className="text-[10px] font-mono text-zinc-400">Confidence</span>
                   <div className="text-2xl font-bold font-mono text-[#2A2B2E] dark:text-white">
                     {selectedPacket.confidence}%
@@ -970,25 +974,25 @@ export default function LiveDetection() {
                 </div>
               </div>
 
-              {/* Honesty Callout if Normal or R2L/U2R */}
+              {/* Honesty Callout if Normal */}
               {selectedPacket.verdict === 'normal' && (
-                <div className="p-3 rounded-xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 text-xs">
+                <div className="p-2.5 rounded-xl bg-amber-50/90 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 text-xs shrink-0">
                   <div className="flex items-center gap-1.5 font-semibold mb-0.5">
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                     <span>Benchmark Honesty Notice</span>
                   </div>
                   <p className="text-[11px] leading-relaxed">
-                    A verdict of <strong>Normal</strong> does not guarantee absence of intrusion. Due to extreme benchmark rarity, low-footprint R2L or U2R exploits can pass undetected.
+                    A verdict of <strong>Normal</strong> does not guarantee absence of intrusion. Due to extreme rarity, low-footprint exploits can pass undetected.
                   </p>
                 </div>
               )}
 
               {/* Class Probability Distribution */}
-              <div>
-                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#6B6D70] dark:text-gray-400 block mb-2">
+              <div className="shrink-0">
+                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[#6B6D70] dark:text-gray-400 block mb-1">
                   Multi-Class Probabilities
                 </span>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {CLASS_DISPLAY_ORDER.map(cls => {
                     const prob = (selectedPacket.prediction.probabilities?.[cls] || 0) * 100;
                     const isWinner = selectedPacket.verdict === cls;
@@ -1019,9 +1023,9 @@ export default function LiveDetection() {
 
               {/* XGBoost Top SHAP Log-Odds Contributions */}
               {selectedPacket.prediction.contributions && (
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#6B6D70] dark:text-gray-400">
+                <div className="shrink-0">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[#6B6D70] dark:text-gray-400">
                       Top Decision Drivers (SHAP)
                     </span>
                     <span className="text-[10px] text-zinc-400 font-mono">
@@ -1029,24 +1033,24 @@ export default function LiveDetection() {
                     </span>
                   </div>
 
-                  <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                    {selectedPacket.prediction.contributions.map((c, i) => {
+                  <div className="space-y-1.5">
+                    {selectedPacket.prediction.contributions.slice(0, 4).map((c, i) => {
                       const formatted = formatContribution(c.contribution, selectedPacket.verdict);
                       return (
                         <div
                           key={i}
-                          className="p-2 rounded-lg bg-[#F6F5F1] dark:bg-[#161719] border border-[#EDEEEA] dark:border-[#2E3036] flex items-center justify-between text-xs"
+                          className="px-3 py-1.5 rounded-lg bg-[#F6F5F1] dark:bg-[#161719] border border-[#EDEEEA] dark:border-[#2E3036] flex items-center justify-between text-xs h-[38px]"
                         >
-                          <div className="flex flex-col">
-                            <span className="font-mono font-bold text-[#2A2B2E] dark:text-white text-[11px]">
+                          <div className="flex flex-col truncate mr-2">
+                            <span className="font-mono font-bold text-[#2A2B2E] dark:text-white text-[11px] truncate">
                               {c.feature}
                             </span>
-                            <span className="text-[10px] text-zinc-500 font-mono">
+                            <span className="text-[10px] text-zinc-500 font-mono truncate">
                               val: {String(c.value)} &bull; {formatted.direction}
                             </span>
                           </div>
                           <span
-                            className={`font-mono text-xs font-bold ${
+                            className={`font-mono text-xs font-bold shrink-0 ${
                               formatted.isToward ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                             }`}
                           >
@@ -1059,27 +1063,27 @@ export default function LiveDetection() {
                 </div>
               )}
 
-              {/* Core Feature Summary Grid */}
-              <div>
-                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#6B6D70] dark:text-gray-400 block mb-2">
+              {/* Core Feature Summary Grid - 4 Columns Across with Identical Heights */}
+              <div className="shrink-0 pt-1">
+                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[#6B6D70] dark:text-gray-400 block mb-1">
                   Sample Feature Snapshot
                 </span>
-                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
-                    <span className="text-[10px] text-zinc-400 block">src_bytes</span>
-                    <span className="font-bold text-[#2A2B2E] dark:text-white">{selectedPacket.features.src_bytes}</span>
+                <div className="grid grid-cols-4 gap-2 text-xs font-mono">
+                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 h-[50px] flex flex-col justify-between">
+                    <span className="text-[10px] text-zinc-400 block truncate">src_bytes</span>
+                    <span className="font-bold text-[#2A2B2E] dark:text-white truncate">{selectedPacket.features.src_bytes}</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
-                    <span className="text-[10px] text-zinc-400 block">dst_bytes</span>
-                    <span className="font-bold text-[#2A2B2E] dark:text-white">{selectedPacket.features.dst_bytes}</span>
+                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 h-[50px] flex flex-col justify-between">
+                    <span className="text-[10px] text-zinc-400 block truncate">dst_bytes</span>
+                    <span className="font-bold text-[#2A2B2E] dark:text-white truncate">{selectedPacket.features.dst_bytes}</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
-                    <span className="text-[10px] text-zinc-400 block">count</span>
-                    <span className="font-bold text-[#2A2B2E] dark:text-white">{selectedPacket.features.count}</span>
+                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 h-[50px] flex flex-col justify-between">
+                    <span className="text-[10px] text-zinc-400 block truncate">count</span>
+                    <span className="font-bold text-[#2A2B2E] dark:text-white truncate">{selectedPacket.features.count}</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
-                    <span className="text-[10px] text-zinc-400 block">logged_in</span>
-                    <span className="font-bold text-[#2A2B2E] dark:text-white">{selectedPacket.features.logged_in}</span>
+                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 h-[50px] flex flex-col justify-between">
+                    <span className="text-[10px] text-zinc-400 block truncate">logged_in</span>
+                    <span className="font-bold text-[#2A2B2E] dark:text-white truncate">{selectedPacket.features.logged_in}</span>
                   </div>
                 </div>
               </div>
@@ -1092,6 +1096,7 @@ export default function LiveDetection() {
           )}
         </div>
       </div>
+
     </div>
   );
 }
