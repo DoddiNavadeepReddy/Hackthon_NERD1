@@ -7,6 +7,7 @@ import logging
 import math
 import os
 import time
+import warnings
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
@@ -87,14 +88,16 @@ class ModelService:
         self.schema = self._read_json(self.exports_dir / "schema.json")
         self.metrics = self._read_json(self.exports_dir / "metrics.json")
         self.samples = self._read_json(self.exports_dir / "sample_rows.json")
-        self.metadata = joblib.load(self.models_dir / "nsl_kdd_metadata.joblib")
-        self.model = joblib.load(self.models_dir / "nsl_kdd_best_multiclass_model.joblib")
-        self.preprocessor = joblib.load(self.models_dir / "nsl_kdd_preprocessor.joblib")
-        self.target_encoder = joblib.load(self.models_dir / "nsl_kdd_target_encoder.joblib")
-        self.feature_encoders = joblib.load(
-            self.models_dir / "nsl_kdd_feature_encoders.joblib"
-        )
-        self.scaler = joblib.load(self.models_dir / "nsl_kdd_scaler.joblib")
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.metadata = joblib.load(self.models_dir / "nsl_kdd_metadata.joblib")
+            self.model = joblib.load(self.models_dir / "nsl_kdd_best_multiclass_model.joblib")
+            self.preprocessor = joblib.load(self.models_dir / "nsl_kdd_preprocessor.joblib")
+            self.target_encoder = joblib.load(self.models_dir / "nsl_kdd_target_encoder.joblib")
+            self.feature_encoders = joblib.load(
+                self.models_dir / "nsl_kdd_feature_encoders.joblib"
+            )
+            self.scaler = joblib.load(self.models_dir / "nsl_kdd_scaler.joblib")
         self.feature_names = list(self.metadata["feature_cols"])
         self.classes = [str(item) for item in self.target_encoder.classes_]
         self.factors = {
