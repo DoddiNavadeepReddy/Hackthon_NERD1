@@ -20,6 +20,8 @@ import {
   CLASS_DESCRIPTIONS,
   normalizeConfusionMatrix 
 } from '../api/client.js';
+import fallbackMetrics from '../data/metrics.json';
+import fallbackModelInfo from '../data/modelInfo.json';
 
 function IsometricTopology() {
   return (
@@ -140,53 +142,29 @@ function IsometricTopology() {
 }
 
 export default function Dashboard({ onRetry, onNavigate }) {
-  const [metrics, setMetrics] = useState(null);
-  const [modelInfo, setModelInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [metrics, setMetrics] = useState(fallbackMetrics);
+  const [modelInfo, setModelInfo] = useState(fallbackModelInfo);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [testSet, setTestSet] = useState('KDDTest+'); // 'KDDTest+' | 'KDDTest-21'
   const [hoveredCell, setHoveredCell] = useState(null);
 
   useEffect(() => {
-    async function loadData() {
+    let isMounted = true;
+    async function syncLiveData() {
       try {
-        setLoading(true);
         const [m, info] = await Promise.all([getMetrics(), getModelInfo()]);
-        setMetrics(m);
-        setModelInfo(info);
+        if (isMounted) {
+          if (m) setMetrics(m);
+          if (info) setModelInfo(info);
+        }
       } catch (err) {
-        setError(err.message || 'Failed to load dashboard metrics');
-      } finally {
-        setLoading(false);
+        // Backend offline or sleeping: precomputed benchmark data is already rendered in milliseconds
       }
     }
-    loadData();
+    syncLiveData();
+    return () => { isMounted = false; };
   }, []);
-
-  if (loading) {
-    return (
-      <div className="py-24 text-center animate-entrance">
-        <div className="inline-block w-8 h-8 border-3 border-[#2A2B2E] border-t-transparent dark:border-white dark:border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-sm font-medium text-[#6B6D70] dark:text-gray-300">
-          Loading NSL-KDD benchmark metrics from API...
-        </p>
-      </div>
-    );
-  }
-
-  if (error || !metrics) {
-    return (
-      <div className="p-6 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200 animate-entrance">
-        <div className="flex items-center gap-3 mb-2">
-          <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-          <h2 className="font-semibold text-base">Metrics Unavailable</h2>
-        </div>
-        <p className="text-sm text-rose-700 dark:text-rose-300">
-          Could not fetch metrics from backend: {error}. Never showing simulated metrics.
-        </p>
-      </div>
-    );
-  }
 
   const currentMetrics = metrics.final_model?.metrics?.[testSet];
   const perClass = currentMetrics?.per_class || {};

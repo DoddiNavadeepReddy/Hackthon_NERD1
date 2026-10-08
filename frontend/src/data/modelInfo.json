@@ -1,0 +1,19 @@
+{
+  "model_name": "XGBoost",
+  "classes": ["normal", "DoS", "Probe", "R2L", "U2R"],
+  "threshold_factors": {
+    "R2L": 5.0,
+    "U2R": 1.0
+  },
+  "training_set": "KDDTrain+_20Percent.txt",
+  "cv": {
+    "mean_macro_f1": 0.539092,
+    "std_macro_f1": 0.0124
+  },
+  "limitations": [
+    "NSL-KDD is an older benchmark derived from 1999 DARPA traffic.",
+    "R2L and U2R are severely underrepresented in training traffic.",
+    "Test sets contain unseen zero-day attack variants not present in training.",
+    "KDDTest-21 removes the easiest 21 records and is intentionally more difficult."
+  ]
+}

@@ -12,7 +12,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [theme, setTheme] = useState('light');
   const [motionEnabled, setMotionEnabled] = useState(true);
-  const [serverStatus, setServerStatus] = useState('waking'); // 'online' | 'waking' | 'offline'
+  const [serverStatus, setServerStatus] = useState('online'); // 'online' | 'waking' | 'offline'
   const [retryState, setRetryState] = useState({ attempt: 1, maxRetries: 15 });
 
   // Sync theme to root class
@@ -52,21 +52,30 @@ export default function App() {
     }
   }, [motionEnabled]);
 
-  // Connect to API and handle Render wake-up
-  const checkServer = useCallback(async () => {
-    setServerStatus('waking');
+  // Connect to API quietly on mount
+  const checkServer = useCallback(async (isManual = false) => {
     try {
-      await waitForServer((retryInfo) => {
-        setRetryState(retryInfo);
-      }, 15, 2000);
+      await getHealth();
       setServerStatus('online');
     } catch {
-      setServerStatus('offline');
+      if (isManual) {
+        setServerStatus('waking');
+        try {
+          await waitForServer((retryInfo) => {
+            setRetryState(retryInfo);
+          }, 15, 2000);
+          setServerStatus('online');
+        } catch {
+          setServerStatus('offline');
+        }
+      } else {
+        setServerStatus('offline');
+      }
     }
   }, []);
 
   useEffect(() => {
-    checkServer();
+    checkServer(false);
   }, [checkServer]);
 
   return (
