@@ -2,8 +2,9 @@
   "name": "hackthon-nerd1",
   "private": true,
   "scripts": {
-    "dev": "npm --prefix frontend run dev",
+    "postinstall": "npm --prefix frontend install",
     "build": "npm --prefix frontend run build",
+    "dev": "npm --prefix frontend run dev",
     "preview": "npm --prefix frontend run preview",
     "test": "npm --prefix frontend test"
   }

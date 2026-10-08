@@ -8,7 +8,18 @@ export function getApiBaseUrl() {
     const saved = window.localStorage.getItem('NERD_API_URL');
     if (saved && saved.trim()) return saved.trim().replace(/\/+$/, '');
   }
-  return (import.meta.env.VITE_API_URL || 'http://localhost:8000').trim().replace(/\/+$/, '');
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '');
+  }
+  if (
+    typeof window !== 'undefined' &&
+    window.location &&
+    window.location.hostname &&
+    !['localhost', '127.0.0.1'].includes(window.location.hostname)
+  ) {
+    return '';
+  }
+  return 'http://localhost:8000';
 }
 
 export function setApiBaseUrl(newUrl) {
