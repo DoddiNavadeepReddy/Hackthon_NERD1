@@ -3,7 +3,25 @@
  * Generated strictly against docs/api-contract.md
  */
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export function getApiBaseUrl() {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const saved = window.localStorage.getItem('NERD_API_URL');
+    if (saved && saved.trim()) return saved.trim().replace(/\/+$/, '');
+  }
+  return (import.meta.env.VITE_API_URL || 'http://localhost:8000').trim().replace(/\/+$/, '');
+}
+
+export function setApiBaseUrl(newUrl) {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    if (newUrl && newUrl.trim()) {
+      window.localStorage.setItem('NERD_API_URL', newUrl.trim().replace(/\/+$/, ''));
+    } else {
+      window.localStorage.removeItem('NERD_API_URL');
+    }
+  }
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Standard display order for attack classes across all NERD UI views.
@@ -86,7 +104,7 @@ export class ApiError extends Error {
  * Internal fetch helper with JSON and error parsing
  */
 async function apiFetch(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = `${getApiBaseUrl()}${endpoint}`;
   let response;
   try {
     response = await fetch(url, options);
@@ -228,7 +246,7 @@ export async function predictBatch(file) {
   const formData = new FormData();
   formData.append('file', file);
 
-  const url = `${API_BASE_URL}/predict/batch`;
+  const url = `${getApiBaseUrl()}/predict/batch`;
   let response;
   try {
     response = await fetch(url, {
@@ -260,5 +278,5 @@ export async function predictBatch(file) {
  */
 export function getShapImageUrl(filename) {
   const cleanName = filename.replace(/^exports\/shap\//, '').replace(/^\/static\/shap\//, '');
-  return `${API_BASE_URL}/static/shap/${cleanName}`;
+  return `${getApiBaseUrl()}/static/shap/${cleanName}`;
 }
