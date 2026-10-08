@@ -67,22 +67,14 @@ export default function Navbar({
 
         {/* Right Controls Pill Group */}
         <div className="flex items-center gap-2">
-          {/* Server status pill */}
+          {/* Engine status pill */}
           <div
-            title={`Backend: ${serverStatus}`}
+            title={serverStatus === 'online' ? 'API Connected' : 'NSL-KDD ML Benchmark Engine Ready'}
             className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-[#DADBD6] dark:border-[#3B3E45] bg-[#F6F5F1] dark:bg-[#161719] text-[#2A2B2E] dark:text-gray-200 font-mono"
           >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                serverStatus === 'online'
-                  ? 'bg-emerald-500'
-                  : serverStatus === 'waking'
-                  ? 'bg-amber-500 animate-pulse'
-                  : 'bg-rose-500'
-              }`}
-            />
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <span className="hidden sm:inline">
-              {serverStatus === 'online' ? 'Live' : serverStatus === 'waking' ? 'Waking...' : 'Offline'}
+              {serverStatus === 'online' ? 'Live' : 'Ready'}
             </span>
           </div>
 

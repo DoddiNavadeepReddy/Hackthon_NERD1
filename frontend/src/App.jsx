@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar.jsx';
-import ServerWakeBanner from './components/ServerWakeBanner.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import LiveDetection from './pages/LiveDetection.jsx';
 import Explainability from './pages/Explainability.jsx';
@@ -88,12 +87,6 @@ export default function App() {
         motionEnabled={motionEnabled}
         setMotionEnabled={setMotionEnabled}
         serverStatus={serverStatus}
-      />
-
-      <ServerWakeBanner
-        serverStatus={serverStatus}
-        retryState={retryState}
-        onManualRetry={checkServer}
       />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 pb-16">
